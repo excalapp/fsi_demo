@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>FinTechCo{% block page_title %} - Portfolio Management{% endblock %}</title>
+<link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+<div id="topnav">
+  <div id="topnav-inner">
+    <div id="logo">FinTech<span>Co</span></div>
+    <ul id="mainnav">
+      <li><a href="/overview" class="{{ 'active' if active_page in ['overview','holdings','performance','transactions','watchlist','markets'] else '' }}">Portfolio</a></li>
+      <li><a href="/accounts" class="{{ 'active' if active_page == 'accounts' else '' }}">Accounts</a></li>
+      <li><a href="/research" class="{{ 'active' if active_page == 'research' else '' }}">Research</a></li>
+      <li><a href="/reports" class="{{ 'active' if active_page == 'reports' else '' }}">Reports</a></li>
+    </ul>
+    <div id="user-area">
+      <span class="user-avatar">JD</span>
+      <span>John Doe</span>
+    </div>
+  </div>
+</div>
+
+<div id="layout">
+  <div id="sidebar">
+    <ul id="sidenav">
+      <li><a href="/overview"      class="{{ 'active' if active_page == 'overview'      else '' }}">Overview</a></li>
+      <li><a href="/holdings"      class="{{ 'active' if active_page == 'holdings'      else '' }}">Holdings</a></li>
+      <li><a href="/performance"   class="{{ 'active' if active_page == 'performance'   else '' }}">Performance</a></li>
+      <li><a href="/transactions"  class="{{ 'active' if active_page == 'transactions'  else '' }}">Transactions</a></li>
+      <li><a href="/watchlist"     class="{{ 'active' if active_page == 'watchlist'     else '' }}">Watchlist</a></li>
+      <li><a href="/markets"       class="{{ 'active' if active_page == 'markets'       else '' }}">Markets</a></li>
+    </ul>
+  </div>
+
+  <div id="content">
+    {% block content %}{% endblock %}
+  </div>
+</div>
+
+<div id="footer">
+  &copy; 2010&ndash;{{ now_year }} FinTechCo &bull; Data provided by Yahoo Finance &bull; For informational purposes only &bull; Not financial advice
+</div>
+
+{% block scripts %}{% endblock %}
+</body>
+</html>

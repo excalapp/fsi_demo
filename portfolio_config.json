@@ -1,0 +1,20 @@
+{
+  "cash": 24580.00,
+  "holdings": [
+    {"ticker": "AAPL",  "name": "Apple Inc.",         "shares": 50,  "avg_cost": 150.00, "asset_class": "US Equities"},
+    {"ticker": "MSFT",  "name": "Microsoft Corp.",     "shares": 30,  "avg_cost": 280.00, "asset_class": "US Equities"},
+    {"ticker": "AMZN",  "name": "Amazon.com Inc.",     "shares": 10,  "avg_cost": 120.00, "asset_class": "US Equities"},
+    {"ticker": "GOOGL", "name": "Alphabet Inc.",       "shares": 15,  "avg_cost": 135.00, "asset_class": "US Equities"},
+    {"ticker": "VOO",   "name": "Vanguard S&P 500 ETF","shares": 40,  "avg_cost": 380.00, "asset_class": "ETFs"},
+    {"ticker": "QQQ",   "name": "Invesco QQQ Trust",   "shares": 20,  "avg_cost": 340.00, "asset_class": "ETFs"},
+    {"ticker": "BND",   "name": "Vanguard Total Bond", "shares": 50,  "avg_cost": 72.00,  "asset_class": "Fixed Income"},
+    {"ticker": "VEA",   "name": "Vanguard FTSE Dev. Markets","shares": 100, "avg_cost": 45.00, "asset_class": "International"}
+  ],
+  "watchlist": [
+    {"ticker": "NVDA", "name": "NVIDIA Corp."},
+    {"ticker": "TSLA", "name": "Tesla Inc."},
+    {"ticker": "META", "name": "Meta Platforms Inc."},
+    {"ticker": "NFLX", "name": "Netflix Inc."},
+    {"ticker": "AMD",  "name": "Advanced Micro Devices"}
+  ]
+}

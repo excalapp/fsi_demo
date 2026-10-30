@@ -1,0 +1,6 @@
+fastapi
+uvicorn[standard]
+jinja2
+python-multipart
+yfinance>=0.2.0
+pandas

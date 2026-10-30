@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block page_title %} - Watchlist{% endblock %}
+
+{% block content %}
+<div class="pg-hdr">
+  <div class="pg-title">Watchlist</div>
+  <div class="pg-meta">Last updated: <span id="ts"></span></div>
+</div>
+
+<div class="panel">
+  <div class="panel-hdr">Tracked Securities</div>
+  <div class="panel-body" style="padding:0;">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Symbol</th>
+          <th class="num">Last Price</th>
+          <th class="num">Day Change</th>
+          <th class="num">Day Change %</th>
+          <th class="num">52-Wk Low</th>
+          <th>52-Wk Range</th>
+          <th class="num">52-Wk High</th>
+          <th class="num">Volume</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in watchlist %}
+        {% set pct_pos = 0 %}
+        {% if item.week52_high > item.week52_low %}
+          {% set pct_pos = ((item.price - item.week52_low) / (item.week52_high - item.week52_low) * 100) | round(1) %}
+        {% endif %}
+        <tr>
+          <td>
+            <span class="sym">{{ item.ticker }}</span>
+            <span class="co-name">{{ item.name }}</span>
+          </td>
+          <td class="num"><strong>{{ fmt_usd(item.price) }}</strong></td>
+          <td class="num {{ 'gain' if item.day_change >= 0 else 'loss' }}">
+            {{ fmt_chg(item.day_change) }}
+          </td>
+          <td class="num {{ 'gain' if item.day_change_pct >= 0 else 'loss' }}">
+            {{ fmt_pct(item.day_change_pct) }}
+          </td>
+          <td class="num" style="color:#666;">{{ fmt_usd(item.week52_low) }}</td>
+          <td style="padding:5px 8px;">
+            <div class="range-bar-wrap">
+              <div class="range-bar-bg">
+                <div class="range-bar-fill" style="width:{{ [pct_pos, 100] | min }}%;"></div>
+              </div>
+              <div class="range-labels">
+                <span>L</span><span>{{ pct_pos }}%</span><span>H</span>
+              </div>
+            </div>
+          </td>
+          <td class="num" style="color:#666;">{{ fmt_usd(item.week52_high) }}</td>
+          <td class="num" style="color:#555;">
+            {% if item.volume > 0 %}
+              {% if item.volume >= 1000000 %}
+                {{ (item.volume / 1000000) | round(2) }}M
+              {% elif item.volume >= 1000 %}
+                {{ (item.volume / 1000) | round(1) }}K
+              {% else %}
+                {{ item.volume }}
+              {% endif %}
+            {% else %}
+              &ndash;
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>document.getElementById('ts').textContent = new Date().toLocaleString();</script>
+{% endblock %}

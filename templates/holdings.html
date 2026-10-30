@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block page_title %} - Holdings{% endblock %}
+
+{% block content %}
+<div class="pg-hdr">
+  <div class="pg-title">Holdings</div>
+  <div class="pg-meta">Last updated: <span id="ts"></span></div>
+</div>
+
+{# ── Summary stat bar ────────────────────────────────────── #}
+<div class="hld-stat-bar">
+  <div class="hld-stat">
+    <div class="hld-stat-lbl">Total Value</div>
+    <div class="hld-stat-val">{{ fmt_usd(port.total_val) }}</div>
+  </div>
+  <div class="hld-stat">
+    <div class="hld-stat-lbl">Market Value</div>
+    <div class="hld-stat-val">{{ fmt_usd(port.total_mkt) }}</div>
+  </div>
+  <div class="hld-stat">
+    <div class="hld-stat-lbl">Cash</div>
+    <div class="hld-stat-val">{{ fmt_usd(port.cash) }}</div>
+  </div>
+  <div class="hld-stat">
+    <div class="hld-stat-lbl">Total Gain / Loss</div>
+    <div class="hld-stat-val {{ 'gain' if port.total_gain >= 0 else 'loss' }}">
+      {{ fmt_chg(port.total_gain) }}&nbsp;<span style="font-size:11px;">({{ fmt_pct(port.total_gain_pct) }})</span>
+    </div>
+  </div>
+  <div class="hld-stat">
+    <div class="hld-stat-lbl">Today's Gain / Loss</div>
+    <div class="hld-stat-val {{ 'gain' if port.day_pl >= 0 else 'loss' }}">
+      {{ fmt_chg(port.day_pl) }}&nbsp;<span style="font-size:11px;">({{ fmt_pct(port.day_pct) }})</span>
+    </div>
+  </div>
+</div>
+
+{# ── Positions table ─────────────────────────────────────── #}
+<div class="panel">
+  <div class="panel-hdr">
+    <span>All Positions &mdash; {{ port.positions | length }} holdings</span>
+  </div>
+  <div class="tbl-scroll">
+    <table class="data-table hld-table">
+      <thead>
+        <tr>
+          <th style="min-width:130px;">Symbol</th>
+          <th style="min-width:90px;">Asset Class</th>
+          <th class="num" style="min-width:55px;">Shares</th>
+          <th class="num" style="min-width:75px;">Avg&nbsp;Cost</th>
+          <th class="num" style="min-width:80px;">Price</th>
+          <th class="num" style="min-width:85px;">Mkt&nbsp;Value</th>
+          <th class="num" style="min-width:80px;">Cost&nbsp;Basis</th>
+          <th class="num" style="min-width:85px;">Gain&nbsp;$</th>
+          <th class="num" style="min-width:70px;">Gain&nbsp;%</th>
+          <th class="num" style="min-width:80px;">Day&nbsp;Chg&nbsp;$</th>
+          <th class="num" style="min-width:70px;">Day&nbsp;%</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for pos in port.positions %}
+        <tr>
+          <td>
+            <span class="sym">{{ pos.ticker }}</span>
+            <span class="co-name">{{ pos.name }}</span>
+          </td>
+          <td><span class="asset-badge asset-{{ pos.asset_class | replace(' ', '-') | lower }}">{{ pos.asset_class }}</span></td>
+          <td class="num">{{ pos.shares }}</td>
+          <td class="num">{{ fmt_usd(pos.avg_cost) }}</td>
+          <td class="num"><strong>{{ fmt_usd(pos.price) }}</strong></td>
+          <td class="num"><strong>{{ fmt_usd(pos.mkt_val) }}</strong></td>
+          <td class="num" style="color:#555;">{{ fmt_usd(pos.cost_basis) }}</td>
+          <td class="num {{ 'gain' if pos.gain_loss >= 0 else 'loss' }}">{{ fmt_chg(pos.gain_loss) }}</td>
+          <td class="num {{ 'gain' if pos.gain_loss_pct >= 0 else 'loss' }}">{{ fmt_pct(pos.gain_loss_pct) }}</td>
+          <td class="num {{ 'gain' if pos.day_change >= 0 else 'loss' }}">{{ fmt_chg(pos.day_change) }}</td>
+          <td class="num {{ 'gain' if pos.day_change_pct >= 0 else 'loss' }}">{{ fmt_pct(pos.day_change_pct) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr class="tbl-total">
+          <td colspan="5" style="padding:5px 8px;font-weight:bold;font-size:11px;color:#2a3a5a;text-transform:uppercase;letter-spacing:.3px;">Portfolio Total</td>
+          <td class="num" style="padding:5px 8px;font-weight:bold;">{{ fmt_usd(port.total_mkt) }}</td>
+          <td class="num" style="padding:5px 8px;font-weight:bold;color:#555;">{{ fmt_usd(port.positions | sum(attribute='cost_basis')) }}</td>
+          <td class="num {{ 'gain' if port.total_gain >= 0 else 'loss' }}" style="padding:5px 8px;font-weight:bold;">{{ fmt_chg(port.total_gain) }}</td>
+          <td class="num {{ 'gain' if port.total_gain_pct >= 0 else 'loss' }}" style="padding:5px 8px;font-weight:bold;">{{ fmt_pct(port.total_gain_pct) }}</td>
+          <td class="num {{ 'gain' if port.day_pl >= 0 else 'loss' }}" style="padding:5px 8px;font-weight:bold;">{{ fmt_chg(port.day_pl) }}</td>
+          <td class="num {{ 'gain' if port.day_pct >= 0 else 'loss' }}" style="padding:5px 8px;font-weight:bold;">{{ fmt_pct(port.day_pct) }}</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>document.getElementById('ts').textContent = new Date().toLocaleString();</script>
+{% endblock %}

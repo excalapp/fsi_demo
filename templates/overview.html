@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% block page_title %} - Overview{% endblock %}
+
+{% block content %}
+<div class="pg-hdr">
+  <div class="pg-title">Portfolio Overview</div>
+  <div class="pg-meta">Last updated: <span id="ts"></span></div>
+</div>
+
+{# ── Stat cards ───────────────────────────────────────────── #}
+<div class="stat-row">
+  <div class="stat-card">
+    <div class="stat-card-hdr">Total Portfolio Value</div>
+    <div class="stat-card-body">
+      <div class="stat-val">{{ fmt_usd(port.total_val) }}</div>
+      <div class="stat-sub {{ 'gain' if port.total_gain >= 0 else 'loss' }}">
+        {{ fmt_chg(port.total_gain) }} ({{ fmt_pct(port.total_gain_pct) }}) all time
+      </div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card-hdr">Day's Gain / Loss</div>
+    <div class="stat-card-body">
+      <div class="stat-val {{ 'gain' if port.day_pl >= 0 else 'loss' }}">{{ fmt_chg(port.day_pl) }}</div>
+      <div class="stat-sub {{ 'gain' if port.day_pl >= 0 else 'loss' }}">{{ fmt_pct(port.day_pct) }}</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card-hdr">Total Gain / Loss</div>
+    <div class="stat-card-body">
+      <div class="stat-val {{ 'gain' if port.total_gain >= 0 else 'loss' }}">{{ fmt_chg(port.total_gain) }}</div>
+      <div class="stat-sub {{ 'gain' if port.total_gain >= 0 else 'loss' }}">{{ fmt_pct(port.total_gain_pct) }}</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card-hdr">Cash Balance</div>
+    <div class="stat-card-body">
+      <div class="stat-val">{{ fmt_usd(port.cash) }}</div>
+      <div class="stat-note">Available to invest</div>
+    </div>
+  </div>
+</div>
+
+{# ── Performance chart ────────────────────────────────────── #}
+<div class="panel">
+  <div class="panel-hdr">
+    <span>Portfolio Performance</span>
+    <div class="period-btns">
+      {% for p in periods %}
+      <button class="period-btn {{ 'active' if p == active_period else '' }}"
+              data-period="{{ p }}"
+              onclick="switchPeriod('{{ p }}')">{{ p }}</button>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="panel-body">
+    <div class="chart-wrap">
+      <canvas id="perfChart"></canvas>
+    </div>
+  </div>
+</div>
+
+{# ── Allocation + Top Holdings ────────────────────────────── #}
+<div class="two-col">
+
+  <div class="panel">
+    <div class="panel-hdr">Asset Allocation</div>
+    <div class="panel-body">
+      <div class="alloc-layout">
+        <div class="alloc-chart-box">
+          <canvas id="allocChart"></canvas>
+        </div>
+        <div class="alloc-legend">
+          {% set colors = ['#2563b8','#2e9e58','#c53030','#d97706','#718096','#7c3aed'] %}
+          <table>
+            {% for cls, pct in port.alloc_pct.items() %}
+            <tr>
+              <td>
+                <span class="swatch" style="background:{{ colors[loop.index0 % colors|length] }};"></span>
+                {{ cls }}
+              </td>
+              <td style="text-align:right;font-weight:bold;">{{ pct }}%</td>
+            </tr>
+            {% endfor %}
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-hdr">
+      <span>Top Holdings</span>
+      <a href="/holdings" class="view-all">View All &raquo;</a>
+    </div>
+    <div class="panel-body" style="padding:0;">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Symbol</th>
+            <th class="num">Price</th>
+            <th class="num">Mkt Value</th>
+            <th class="num">Gain / Loss</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for pos in port.positions[:5] %}
+          <tr>
+            <td>
+              <span class="sym">{{ pos.ticker }}</span>
+              <span class="co-name">{{ pos.name }}</span>
+            </td>
+            <td class="num">{{ fmt_usd(pos.price) }}</td>
+            <td class="num">{{ fmt_usd(pos.mkt_val) }}</td>
+            <td class="num {{ 'gain' if pos.gain_loss >= 0 else 'loss' }}">
+              {{ fmt_chg(pos.gain_loss) }}<br>
+              <span style="font-size:10px;">{{ fmt_pct(pos.gain_loss_pct) }}</span>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="/static/js/charts.js"></script>
+<script>
+  document.getElementById('ts').textContent = new Date().toLocaleString();
+
+  const chartLabels = {{ chart_labels | safe }};
+  const chartValues = {{ chart_values | safe }};
+  const allocLabels = [{% for k in port.alloc_pct %}"{{ k }}"{% if not loop.last %},{% endif %}{% endfor %}];
+  const allocValues = [{% for v in port.alloc_pct.values() %}{{ v }}{% if not loop.last %},{% endif %}{% endfor %}];
+
+  document.addEventListener('DOMContentLoaded', function () {
+    initPerfChart(chartLabels, chartValues);
+    initAllocChart(allocLabels, allocValues);
+  });
+</script>
+{% endblock %}
