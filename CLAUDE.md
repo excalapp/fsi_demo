@@ -11,6 +11,14 @@ uvicorn main:app --reload
 
 App runs at http://localhost:8000. The `--reload` flag restarts on source changes.
 
+## Running tests
+
+```bash
+pytest tests/ -v
+```
+
+Tests run without network access — market functions are mocked. All 23 tests should pass in ~4 seconds. Run this before every deploy.
+
 ## Architecture
 
 This is a FastAPI + Jinja2 web app with no database. Data flows in a single direction on every request:
@@ -25,6 +33,17 @@ This is a FastAPI + Jinja2 web app with no database. Data flows in a single dire
 **Placeholder pages** (render empty shell): `/performance`, `/transactions`, `/markets`, `/accounts`, `/research`, `/reports`.
 
 **JSON API:** `GET /api/chart-data?period=<1M|3M|6M|1Y|All>` returns `{labels, values}` for the portfolio history chart; called client-side by `static/js/charts.js` when the user switches periods.
+
+## Templates
+
+All pages extend `templates/base.html`. Every template receives `active_page` (a string matching the route name, e.g. `"holdings"`) which drives sidebar/nav highlighting. The base template also injects `now_year` and the three formatter globals automatically.
+
+The `port` dict passed to implemented pages has this shape:
+- `port.positions` — list of position dicts (keys: `ticker`, `name`, `shares`, `price`, `mkt_val`, `cost_basis`, `gain_loss`, `gain_loss_pct`, `day_change`, `day_change_pct`, `day_pl`, `asset_class`)
+- `port.total_val`, `port.total_mkt`, `port.total_gain`, `port.total_gain_pct`, `port.day_pl`, `port.day_pct`, `port.cash`
+- `port.allocation` — `{asset_class: market_value}`, `port.alloc_pct` — `{asset_class: pct_of_total}`
+
+To implement a placeholder page, remove it from the `_placeholder()` block in `main.py`, add a real route handler that calls `compute_portfolio()` / `get_portfolio_history()` as needed, and replace the stub template with content that extends `base.html`.
 
 ## Portfolio configuration
 
